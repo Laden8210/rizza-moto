@@ -8,7 +8,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="icon" href="images/logo1.png">
-    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" rel="stylesheet">
 
     <style>
@@ -19,6 +18,42 @@
         body {
             font-family: Arial, sans-serif;
             background-color: #e8f5fe;
+        }
+
+        /* Loader Styles */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #4a90e2;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        #loader .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            margin-bottom: 15px;
+        }
+
+        #loader h1 {
+            font-size: 1.5rem;
+            animation: fadeInOut 1s infinite;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
         }
 
         .navbar {
@@ -38,34 +73,40 @@
             color: #d4e9fc;
         }
 
-        .hero-section {
-            background-color: #4a90e2;
-            color: #fff;
-            padding: 80px 0;
-            text-align: center;
-        }
-
-        .hero-section h1 {
-            font-size: 3rem;
-            font-weight: bold;
-        }
-
-        .hero-section p {
-            font-size: 1.5rem;
-            max-width: 800px;
-            margin: auto;
-            line-height: 1.6;
-        }
-
         .carousel-inner img {
             width: 100%;
-            height: 500px;
+            height: 400px;
             object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .carousel-section {
+            padding: 40px 0;
+        }
+
+        .carousel-section .saying {
+            padding-left: 30px;
+        }
+
+        .carousel-section .carousel {
+            flex: 1;
+            max-width: 600px;
+        }
+
+        @media (max-width: 768px) {
+            .carousel-section {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .carousel-section .saying {
+                padding-left: 0;
+                margin-top: 20px;
+            }
         }
 
         .info-section {
-            background: #f0f8ff;
-            color: #333;
+            background: #f9faff;
             padding: 60px 0;
         }
 
@@ -73,70 +114,32 @@
             background-color: #fff;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .info-section .info-card:hover {
-            transform: translateY(-10px);
-        }
-
-        .download-section {
-            background-color: #e8f5fe;
-            padding: 40px 0;
-            text-align: center;
-        }
-
-        .download-section h2 {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-        }
-
-        .btn-download {
-            background-color: #4a90e2;
-            color: #fff;
-            font-weight: bold;
-            padding: 15px 30px;
-            border-radius: 5px;
-        }
-
-        .btn-download:hover {
-            background-color: #357ab8;
-            color: #fff;
+            transform: translateY(-8px);
+            box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15);
         }
 
         footer {
             background-color: #4a90e2;
             color: #fff;
-            padding: 20px 0;
+            padding: 15px 0;
             text-align: center;
-        }
-
-        .carousel-section {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 60px 0;
-        }
-
-        .carousel-section .saying {
-            max-width: 50%;
-            padding-left: 30px;
-        }
-
-        .carousel-section .saying h2 {
-            font-size: 2.5rem;
-            font-weight: bold;
-        }
-
-        .carousel-section .saying p {
-            font-size: 1.5rem;
-            line-height: 1.6;
         }
     </style>
 </head>
 
 <body>
+    <!-- Loader -->
+    <div id="loader">
+        <div class="spinner-border text-light" role="status"></div>
+        <h1>Loading...</h1>
+    </div>
+
     <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container">
             <a class="navbar-brand" href="#">Find My Pet</a>
@@ -153,53 +156,47 @@
                         <a class="nav-link" href="#">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Login</a>
+                        <a class="nav-link" href="login.php">Login</a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <section class="carousel-section">
-        <div id="petCarousel" class="carousel slide" data-bs-ride="carousel" style="max-width: 50%;">
-            <div class="carousel-inner">
-                <div class="carousel-item active">
-                    <img src="img/slide.png" class="d-block w-100" alt="Missing Pet">
-                </div>
-                <div class="carousel-item">
-                    <img src="img/slide-1.png" class="d-block w-100" alt="Happy Reunion">
-                </div>
-                <div class="carousel-item">
-                    <img src="img/slide-2.png" class="d-block w-100" alt="Community Support">
-                </div>
-                <div class="carousel-item">
-                    <img src="img/slide-3.png" class="d-block w-100" alt="Community Support">
-                </div>
-                <div class="carousel-item">
-                    <img src="img/slide-4.png" class="d-block w-100" alt="Community Support">
-                </div>
+    <section class="carousel-section container d-flex align-items-center justify-content-between flex-wrap my-5">
+    <!-- Carousel -->
+    <div id="petCarousel" class="carousel slide" data-bs-ride="carousel" style="max-width: 50%; min-width: 300px;">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="img/slide.png" class="d-block w-100" alt="Missing Pet">
             </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#petCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#petCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
-            </button>
+            <div class="carousel-item">
+                <img src="img/slide-1.png" class="d-block w-100" alt="Happy Reunion">
+            </div>
+            <div class="carousel-item">
+                <img src="img/slide-2.png" class="d-block w-100" alt="Community Support">
+            </div>
         </div>
-        <div class="saying">
-            <h2>Together, We Can Bring Pets Home</h2>
-            <p>Join our community in finding lost pets and reuniting them with their families. Every effort counts, and with your help, we can make a difference in the lives of these beloved animals.</p>
-        </div>
-    </section>
+        <button class="carousel-control-prev" type="button" data-bs-target="#petCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#petCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
 
-    <section class="hero-section">
-        <div class="container">
-            <h1>Find Missing Pets in Your Community!</h1>
-            <p>Join our community to help reunite lost pets with their owners. Share information, post details of lost pets, and support each other in bringing pets back to their loving homes.</p>
-        </div>
-    </section>
+    <!-- Text Section -->
+    <div class="saying text-center text-md-start" style="max-width: 45%; min-width: 300px;">
+        <h2>Together, We Can Bring Pets Home</h2>
+        <p>
+            Join our community in finding lost pets and reuniting them with their families. Every effort counts, and with
+            your help, we can make a difference in the lives of these beloved animals.
+        </p>
+    </div>
+</section>
+
 
     <section class="info-section">
         <div class="container">
@@ -226,18 +223,18 @@
         </div>
     </section>
 
-    <section class="download-section">
-        <div class="container">
-            <h2>Download Our App</h2>
-            <p>Stay connected and receive updates on missing pets in your area. Download our app now to get started!</p>
-            <a href="#" class="btn btn-download">Download App</a>
-        </div>
-    </section>
-
     <footer>
         <p>&copy; 2024 Find My Pet. All rights reserved.</p>
     </footer>
 
+    <script>
+        // Hide loader after 2 seconds
+        window.onload = function () {
+            setTimeout(() => {
+                document.getElementById("loader").style.display = "none";
+            }, 2000);
+        };
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
 </body>

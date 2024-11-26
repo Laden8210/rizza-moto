@@ -3,31 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Print Owners Details</title>
+    <title>Owner and Pet Report</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
+            background-color: #f8f9fa;
         }
 
-        .owner {
+        .report-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .report-header {
+            text-align: center;
             margin-bottom: 20px;
-            border-bottom: 1px solid #ccc;
+        }
+
+        .report-header h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .owner-section {
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ddd;
             padding-bottom: 20px;
         }
 
-        .owner h3 {
+        .owner-section h2 {
+            font-size: 20px;
+            color: #0F5298;
             margin-bottom: 10px;
         }
 
-        .pet {
-            margin-left: 20px;
-            border-left: 2px solid #ccc;
-            padding-left: 10px;
+        .owner-details,
+        .pet-details {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
         }
 
-        .pet p {
-            margin: 5px 0;
+        .owner-details th,
+        .pet-details th {
+            background-color: #0F5298;
+            color: #fff;
+            text-align: left;
+            padding: 8px;
+        }
+
+        .owner-details td,
+        .pet-details td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .pet-details {
+            margin-top: 20px;
+        }
+
+        .print-button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #0F5298;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .print-button:hover {
+            background-color: #66D3FA;
         }
     </style>
 </head>
@@ -37,20 +91,20 @@
     include 'db.php';
 
     // Check if owner IDs are provided in the query string
-    if(isset($_GET['ids']) && !empty($_GET['ids'])) {
+    if (isset($_GET['ids']) && !empty($_GET['ids'])) {
         // Sanitize and retrieve owner IDs
         $ownerIds = explode(',', $_GET['ids']);
         $ownerIds = array_map('intval', $ownerIds); // Convert IDs to integers to prevent SQL injection
 
         // Fetch owner details based on the provided IDs
-        $query = "SELECT * FROM owners WHERE owner_id IN (" . implode(',', $ownerIds) . ")";
+        $query = "SELECT * FROM pet_owner WHERE pet_owner_id IN (" . implode(',', $ownerIds) . ")";
         $result = mysqli_query($conn, $query);
 
         // Store owner details in an array
         $owners = array();
         while ($row = mysqli_fetch_assoc($result)) {
             // Fetch pet details for each owner
-            $query = "SELECT * FROM pets WHERE owner_id = " . $row['owner_id'];
+            $query = "SELECT * FROM pets WHERE pet_owner_id = " . $row['pet_owner_id'];
             $petResult = mysqli_query($conn, $query);
             $pets = array();
             while ($petRow = mysqli_fetch_assoc($petResult)) {
@@ -60,39 +114,87 @@
             $owners[] = $row;
         }
 
-        // Convert owner details to JSON format
-        $jsonOwners = json_encode($owners);
         ?>
-        <div id="print-content">
+        <div class="report-container" id="print-content">
+            <div class="report-header">
+                <h1>Owner and Pet Report</h1>
+            </div>
             <?php
             // Display owner and pet details
             foreach ($owners as $owner) {
                 ?>
-                <div class='owner'>
-                    <h3>Owner ID: <?= $owner['owner_id'] ?></h3>
-                    <p>First Name: <?= $owner['first_name'] ?></p>
-                    <p>Last Name: <?= $owner['last_name'] ?></p>
-                    <p>Address: <?= $owner['address'] ?></p>
-                    <p>Contact Number: <?= $owner['contact_number'] ?></p>
-                    <p>Pets:</p>
-                    <?php
-                    foreach ($owner['pets'] as $pet) {
-                        ?>
-                        <div class='pet'>
-                            <p>Pet Type: <?= $pet['type'] ?></p>
-                            <p>Name: <?= $pet['name'] ?></p>
-                            <p>Age: <?= $pet['age'] ?></p>
-                            <p>Breed: <?= $pet['breed'] ?></p>
-                        </div>
+                <div class="owner-section">
+                    <h2>Owner: <?= $owner['first_name'] . ' ' . $owner['last_name'] ?></h2>
+                    <table class="owner-details">
+                        <tr>
+                            <th>Field</th>
+                            <th>Value</th>
+                        </tr>
+                        <tr>
+                            <td>ID</td>
+                            <td><?= $owner['pet_owner_id'] ?></td>
+                        </tr>
+                        <tr>
+                            <td>Email</td>
+                            <td><?= $owner['email'] ?></td>
+                        </tr>
+                        <tr>
+                            <td>Gender</td>
+                            <td><?= $owner['gender'] ?></td>
+                        </tr>
+                        <tr>
+                            <td>Age</td>
+                            <td><?= $owner['age'] ?></td>
+                        </tr>
+                        <tr>
+                            <td>Phone</td>
+                            <td><?= $owner['phone'] ?></td>
+                        </tr>
+                        <tr>
+                            <td>Address</td>
+                            <td>
+                                <?= $owner['house_number'] . ', ' . $owner['street'] . ', ' . $owner['brgy'] . ', ' . $owner['city'] . ', ' . $owner['province'] . ' ' . $owner['zip_code'] ?>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <h3>Pets</h3>
+                    <table class="pet-details">
+                        <tr>
+                            <th>Pet Name</th>
+                            <th>Type</th>
+                            <th>Breed</th>
+                            <th>Color</th>
+                            <th>Age</th>
+                            <th>Weight (kg)</th>
+                            <th>Height (cm)</th>
+                            <th>Status</th>
+                            <th>Description</th>
+                        </tr>
                         <?php
-                    }
-                    ?>
+                        foreach ($owner['pets'] as $pet) {
+                            ?>
+                            <tr>
+                                <td><?= $pet['pet_name'] ?></td>
+                                <td><?= $pet['type'] ?></td>
+                                <td><?= $pet['breed'] ?></td>
+                                <td><?= $pet['color'] ?></td>
+                                <td><?= $pet['age'] ?></td>
+                                <td><?= $pet['weight'] ?></td>
+                                <td><?= $pet['height'] ?></td>
+                                <td><?= $pet['pet_status'] ?></td>
+                                <td><?= $pet['description'] ?></td>
+                            </tr>
+                            <?php
+                        }
+                        ?>
+                    </table>
                 </div>
                 <?php
             }
             ?>
         </div>
-        <button onclick="printContent()">Print</button>
+        <button class="print-button" onclick="printContent()">Print Report</button>
         <script>
             function printContent() {
                 var printWindow = window.open('', '_blank');
@@ -105,7 +207,6 @@
         </script>
         <?php
     } else {
-        // No owner IDs provided, display an error message or redirect
         echo "<p>No owner IDs provided.</p>";
     }
     ?>

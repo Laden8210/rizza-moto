@@ -3,79 +3,102 @@ include 'db.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Process form submission to register owner and pets
+    $first_name = mysqli_real_escape_string($conn, $_POST['first_name'] ?? '');
+    $last_name = mysqli_real_escape_string($conn, $_POST['last_name'] ?? '');
+    $middle_name = mysqli_real_escape_string($conn, $_POST['middle_name'] ?? '');
+    $gender = mysqli_real_escape_string($conn, $_POST['gender'] ?? '');
+    $age = mysqli_real_escape_string($conn, $_POST['age'] ?? '');
+    $birthdate = mysqli_real_escape_string($conn, date('Y-m-d', strtotime($_POST['birthdate'] ?? '')));
+    $email = mysqli_real_escape_string($conn, $_POST['email'] ?? '');
+    $house_number = mysqli_real_escape_string($conn, $_POST['house_number'] ?? '');
+    $street = mysqli_real_escape_string($conn, $_POST['street'] ?? '');
+    $brgy = mysqli_real_escape_string($conn, $_POST['brgy'] ?? '');
+    $city = mysqli_real_escape_string($conn, $_POST['city'] ?? '');
+    $province = mysqli_real_escape_string($conn, $_POST['province'] ?? '');
+    $zip_code = mysqli_real_escape_string($conn, $_POST['zip_code'] ?? '');
+    $phone = mysqli_real_escape_string($conn, $_POST['phone'] ?? '');
+    $tel_number = mysqli_real_escape_string($conn, $_POST['tel_number'] ?? null);
+    $user_name = mysqli_real_escape_string($conn, $_POST['user_name'] ?? '');
+    $password = $_POST['password'] ?? '';
+    $image = $_FILES['image']['name'] ?? '';
+    $is_activate = isset($_POST['is_activate']) ? 1 : 0;
 
-    // Owner details
-    $first_name = $_POST['first_name'] ?? '';
-    $last_name = $_POST['last_name'] ?? '';
-    $middle_name = $_POST['middle_name'] ?? '';
-    $Ownergender = $_POST['Ownergender'] ?? '';
-    $Ownerage = $_POST['Ownerage'] ?? '';
-    $date_birth = date('Y-m-d', strtotime($_POST['date_birth'] ?? ''));
-    $email = $_POST['email'] ?? '';
-    $Ownershouse = $_POST['Ownershouse'] ?? '';
-    $Ownersstreet = $_POST['Ownersstreet'] ?? '';
-    $Ownersbrgy = $_POST['Ownersbrgy'] ?? '';
-    $contact_number = $_POST['contact_number'] ?? '';
-
-    // Validate required fields for owner
-    if (empty($first_name) || empty($last_name) || empty($Ownergender) || empty($Ownerage) || empty($date_birth) || empty($email) || empty($Ownershouse) || empty($Ownersstreet) || empty($Ownersbrgy) || empty($contact_number)) {
-        header("Location: Dog&Cat_Registration.php?error=missing_fields");
-        exit();
+    // Handle profile image upload
+    $targetDir = "uploads/";
+    if (!is_dir($targetDir)) {
+        mkdir($targetDir, 0777, true);
+    }
+    $targetFilePath = $targetDir . basename($image);
+    if ($image && !move_uploaded_file($_FILES['image']['tmp_name'], $targetFilePath)) {
+        die("Error uploading profile image.");
     }
 
-    // Insert owner details into the owners table
-    $insertOwnerQuery = "INSERT INTO owners (first_name, last_name, middle_name, Ownergender, Ownerage, date_birth, email, Ownershouse, Ownersstreet, Ownersbrgy, contact_number)
-    VALUES ('$first_name', '$last_name', '$middle_name', '$Ownergender', '$Ownerage', '$date_birth', '$email', '$Ownershouse', '$Ownersstreet', '$Ownersbrgy', '$contact_number')";
 
-    if (!mysqli_query($conn, $insertOwnerQuery)) {
-        echo "Error: " . mysqli_error($conn);
-        exit();
-    }
+    $insertOwnerQuery = "
+        INSERT INTO pet_owner 
+        (first_name, last_name, middle_name, gender, age, birthdate, email, house_number, street, brgy, city, province, zip_code, phone, tel_number, user_name, password, image, is_activate) 
+        VALUES ('$first_name', '$last_name', '$middle_name', '$gender', '$age', '$birthdate', '$email', '$house_number', '$street', '$brgy', '$city', '$province', '$zip_code', '$phone', '$tel_number', '$user_name', '$password', '$image', '$is_activate')";
 
-    // Get the ID of the last inserted owner
-    $ownerId = mysqli_insert_id($conn);
+    mysqli_begin_transaction($conn);
+    try {
+        if (!mysqli_query($conn, $insertOwnerQuery)) {
+            throw new Exception("Error: " . mysqli_error($conn));
+        }
 
-    // Pet details
-    $types = $_POST['type'] ?? [];
-    $names = $_POST['name'] ?? [];
-    $petages = $_POST['petage'] ?? [];
-    $age_types = $_POST['age_type'] ?? [];
-    $genders = $_POST['gender'] ?? [];
-    $breeds = $_POST['breed'] ?? [];
-    $desc_breeds = $_POST['desc_breed'] ?? [];
-    $colors = $_POST['color'] ?? [];
-    $statuss = $_POST['status_pet'] ?? [];
+        // Get the last inserted owner's ID
+        $ownerId = mysqli_insert_id($conn);
 
-    // Check if pet arrays are not empty before proceeding
-    if (!empty($types) && !empty($names) && !empty($petages) && !empty($age_types) && !empty($genders) && !empty($breeds) && !empty($desc_breeds) && !empty($colors) && !empty($statuss)) {
-        // Insert pet details into the pets table
+        // Pet details
+        $types = $_POST['pet_type'] ?? [];
+        $names = $_POST['pet_name'] ?? [];
+        $ages = $_POST['pet_age'] ?? [];
+        $genders = $_POST['pet_gender'] ?? [];
+        $breeds = $_POST['breed'] ?? [];
+        $descriptions = $_POST['pet_description'] ?? [];
+        $colors = $_POST['color'] ?? [];
+        $statuses = $_POST['status_pet'] ?? [];
+        $pet_images = $_FILES['pet_image']['name'] ?? [];
+        $pet_birthdates = $_POST['birthdate'] ?? [];
+        $weights = $_POST['weight'] ?? [];
+        $heights = $_POST['height'] ?? [];
+
         for ($i = 0; $i < count($types); $i++) {
             $type = mysqli_real_escape_string($conn, $types[$i]);
             $name = mysqli_real_escape_string($conn, $names[$i]);
-            $petage = mysqli_real_escape_string($conn, $petages[$i]);
-            $age_type = mysqli_real_escape_string($conn, $age_types[$i]);
+            $age = mysqli_real_escape_string($conn, $ages[$i]);
             $gender = mysqli_real_escape_string($conn, $genders[$i]);
             $breed = mysqli_real_escape_string($conn, $breeds[$i]);
-            $desc_breed = mysqli_real_escape_string($conn, $desc_breeds[$i]);
-            $color = mysqli_real_escape_string($conn, $colors[$i]);
-            $status = mysqli_real_escape_string($conn, $statuss[$i]);
+            $description = mysqli_real_escape_string($conn, $descriptions[$i]);
+            $color = mysqli_real_escape_string($conn, $colors[$i ?? '']);
+            $status = mysqli_real_escape_string($conn, $statuses[$i]);
+            $pet_image = isset($pet_images[$i]) ? $pet_images[$i] : '';
+            $pet_birthdate = mysqli_real_escape_string($conn, $pet_birthdates[$i] ?? null);
+            $weight = mysqli_real_escape_string($conn, $weights[$i] ?? null);
+            $height = mysqli_real_escape_string($conn, $heights[$i] ?? null);
 
-            // Insert pet details into the pets table
-            $insertPetQuery = "INSERT INTO pets (owner_id, name, petage, age_type, gender, breed, desc_breed, color, type, status_pet) 
-                               VALUES ('$ownerId', '$name', '$petage', '$age_type', '$gender', '$breed', '$desc_breed', '$color', '$type', '$status')";
+            // Handle pet image upload
+            $petTargetFilePath = $targetDir . basename($pet_image);
+            if ($pet_image && !move_uploaded_file($_FILES['pet_image']['tmp_name'][$i], $petTargetFilePath)) {
+                throw new Exception("Error uploading pet image for $name.");
+            }
+
+            $insertPetQuery = "
+                INSERT INTO pets (pet_owner_id, pet_name, age, gender, breed, description, color, type, pet_status, image_path, birthdate, weight, height) 
+                VALUES ('$ownerId', '$name', '$age', '$gender', '$breed', '$description', '$color', '$type', '$status', '$pet_image', '$pet_birthdate', '$weight', '$height')";
 
             if (!mysqli_query($conn, $insertPetQuery)) {
-                echo "Error: " . mysqli_error($conn);
-                exit();
+                throw new Exception("Error: " . mysqli_error($conn));
             }
         }
-    }
 
-    // Redirect to registration success page
-    header("Location: Dog&Cat_Registration_success.php");
-    exit();
+        mysqli_commit($conn);
+        header("Location: Dog&Cat_Registration_success.php");
+        exit();
+    } catch (Exception $e) {
+        mysqli_rollback($conn);
+        die("Transaction failed: " . $e->getMessage());
+    }
 } else {
-    // Redirect to registration page if accessed directly without form submission
     header("Location: Pet_management.php");
     exit();
 }

@@ -1,417 +1,399 @@
 <?php
 session_start();
-?>
-<!DOCTYPE html>
+?><!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Owner and Pet Registration</title>
+    <title>Dog & Cat Registration</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-   
-    <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <style>
-         .content {
-        position: static;
-        margin-top: 60px;
-        margin-left: 260px;
-        margin-bottom: 50px;
-        width: 1150px;
-        height: 900x;
-        border: 2px solid #111;
-        border-radius:10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-        padding: 20px; /* Add padding to give space between content and border */
-        }
-        .container {
-        margin-top: 50px;
-        }
-        h2{
-            text-align:center;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-right: 10px;
+        body {
+            background-color: #f8f9fa;
         }
 
-
-        .pet {
+        .sidebar {
+            height: 100vh;
+            width: 250px;
             position: fixed;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 10px;
-            margin-top: 10px;
-            background-color: #f9f9f9;
-            position: relative;
+            top: 0;
+            left: 0;
+            background: linear-gradient(135deg, #0F5298, #66D3FA);
+            color: #fff;
+            transition: all 0.3s ease-in-out;
+            z-index: 999;
         }
 
-        .remove-pet {
+        .sidebar.closed {
+            width: 0;
+            overflow: hidden;
+        }
+
+        .sidebar .brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 0;
+        }
+
+        .sidebar ul {
+            padding: 0;
+            list-style: none;
+        }
+
+        .sidebar ul li {
+            padding: 15px 20px;
+            transition: background 0.3s;
+        }
+
+        .sidebar ul li a {
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar ul li:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar ul li a i {
+            font-size: 1.2rem;
+        }
+
+        .sidebar .social_media {
             position: absolute;
-            top: 1px;
-            right: 1px;
-            background-color: #f44336;
-            color: white;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+
+        .sidebar .social_media a {
+            color: #fff;
+            font-size: 1.2rem;
+            transition: color 0.3s;
+        }
+
+        .sidebar .social_media a:hover {
+            color: #0F5298;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        .main-content.expanded {
+            margin-left: 0;
+        }
+
+        .toggle-btn {
+            position: fixed;
+            left: 10px;
+            top: 10px;
+            background: transparent;
             border: none;
-            border-radius: 20%;
-            width: 25px;
-            height: 25px;
-            font-size: 16px;
-            line-height: 1;
+            color: #0F5298;
+            font-size: 1.5rem;
             cursor: pointer;
-            padding:2px;
+            z-index: 1000;
+        }
+
+        .toggle-btn:hover {
+            color: #66D3FA;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
         }
     </style>
 </head>
+
 <body>
-<?php include 'includes/sidebar1.php'; ?> 
-<?php include 'includes/header.php'; ?>
-<div class="content">
-    <div class="container">
-        <h2>Edit Owner and Pet Registration Form</h2>
-        <form action="Dog&Cat_Registration_process.php" method="POST" onsubmit="return validateForm()">
+    <div class="sidebar" id="sidebar">
+        <div class="brand">
+            <img src="images/logo1.png" alt="Logo" width="120">
+        </div>
+        <ul>
+            <li><a href="Pet_management.php"><i class="fas fa-home"></i> Dashboard</a></li>
+            <li><a href="Dog&Cat_Registration.php"><i class="fas fa-paw"></i> Register Pet</a></li>
+            <li><a href="loss_pets.php"><i class="fas fa-search"></i> Lost/Found</a></li>
+            <li><a href="about_us.php"><i class="fas fa-info-circle"></i> About Us</a></li>
+            <li><a href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+        </ul>
+        <div class="social_media">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+        </div>
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+        <h2>Register Owner and Pets</h2>
+        <form action="Dog&Cat_Registration_process.php" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
             <!-- Owner Details -->
-                <div class="row">
-                    <div class="col-md-3">
-                        <div class="mb-6">
-                            <label for="first_name">First Name:</label>
-                            <input type="text" class="form-control" id="first_name" name="first_name" required>
-                        </div>
-                    </div>    
-                    <div class="col-md-3">
-                        <div class="mb-6">
-                            <label for="last_name">Last Name:</label>
-                            <input type="text" class="form-control" id="last_name" name="last_name" required>
-                        </div>
-                    </div> 
-                    <div class="col-md-3">
-                        <div class="mb-6">
-                            <label for="middle_name">Middle Name:</label>
-                            <input type="text" class="form-control" id="middle_name" name="middle_name">
-                        </div>
-                    </div> 
+            <h4>Owner Details</h4>
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="first_name" class="form-label">First Name:</label>
+                    <input type="text" class="form-control" id="first_name" name="first_name" required>
                 </div>
-
-                <div class="row">
-                    <div class="col-md-2">
-                        <div class="mb-6">        
-                            <label for="Ownergender" class="form-label">Gender:</label>
-                                <select class="form-select" name="Ownergender" required>
-                                    <option value="">Select</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                </select>
-                        </div>
-                    </div> 
-                    <div class="col-md-2">
-                        <div class="mb-6">
-                            <label for="Ownerage" class="form-label">Age:</label>
-                            <input type="number" class="form-control" id="Ownerage" name="Ownerage" min="0"required>
-                        </div>
-                    </div>     
-                    <div class="col-md-2">
-                        <div class="mb-6">
-                            <label for="date_birth" class="form-label">Date of Birth:</label>
-                            <input type="date" class="form-control" id="date_birth" name="date_birth" required>
-                        </div>
-                    </div> 
+                <div class="col-md-4">
+                    <label for="last_name" class="form-label">Last Name:</label>
+                    <input type="text" class="form-control" id="last_name" name="last_name" required>
                 </div>
-
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="mb-6"> 
-                            <label for="email" class="form-label">Email:</label>
-                            <input type="email" class="form-control" id="email" name="email" required><br>
-                        </div>
-                    </div>     
-                    <div class="col-md-3">
-                        <div class="mb-6">
-                            <label for="contact_number" class="form-label">Contact Number:</label>
-                            <input type="tel" class="form-control" id="contact_number" name="contact_number" required pattern="[0-9]{11}" title="Please enter a valid 11-digit phone number starting with 09"><br>
-                        </div>
-                    </div> 
-                </div>
-                <div class="row">
-                    <div class="col-md-2">
-                        <div class="mb-6">
-                            <label for="Ownershouse" class="form-label">House Number:</label>
-                            <input type="text" class="form-control" id="Ownershouse" name="Ownershouse" required><br>
-                        </div>
-                    </div>     
-                    <div class="col-md-2">
-                        <div class="mb-6">
-                            <label for="Ownersstreet" class="form-label">Street:</label>
-                            <input type="text" class="form-control" id="Ownersstreet" name="Ownersstreet" required><br>
-                        </div>
-                    </div> 
-                    <div class="col-md-2">
-                        <div class="mb-6">        
-                            <label for="Ownersbrgy" class="form-label">Gender:</label>
-                                <select class="form-select" name="Ownersbrgy" required>
-                                    <option value="San Roque">San Roque</option>
-                                    
-                                </select>
-                        </div>
-                    </div> 
-                </div>
-
-            <!-- Pet Details (Assuming multiple pets can be registered at once) -->
-            <h2>Pet Details</h2>
-            <div id="pet_details">
-                <div class="pet">
-
-                    <div class="row">
-                        <div class="col-md-3">
-                            <div class="mb-6">
-                                <label for="name" class="form-label">Name:</label>
-                                <input type="text" class="form-control" id="name" name="name[]" required>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="mb-3">
-                                <label for="pet_type_1" class="form-label">Pet Type:</label>
-                                <select class="form-select" id="pet_type_1" name="pet_type[]" required>
-                                    <option value="">Select</option>
-                                    <option value="Dog">Dog</option>
-                                    <option value="Cat">Cat</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                                <div class="mb-3">
-                                <label for="pet_breed_1" class="form-label">Pet Breed:</label>
-                                <select class="form-select" id="pet_breed_1" name="pet_breed[]" required>
-                                    <!-- Breed options will be populated dynamically using JavaScript -->
-                                </select>
-                            </div>
-                        </div> 
-                        <div class="col-md-3">
-                            <div class="mb-6">
-                                <label for="desc_breed" class="form-label">Breed Description:</label>
-                                <input type="text" class="form-control" name="desc_breed[]" placeholder="Mixed breed(aspin/poodle)" required>
-                            </div>
-                        </div> 
-                    </div> 
-                    <div class="row">
-                        <div class="col-md-2">
-                            <div class="mb-6">
-                                <label for="petage" class="form-label">Age:</label>
-                                <input type="number" class="form-control" id="petage" name="petage[]" min="0" required>
-                            </div>
-                        </div> 
-                        <div class="col-md-2">
-                            <div class="mb-6">        
-                                <label for="age_type" class="form-label">Yr/Mnth Old:</label>
-                                    <select class="form-select" name="age_type[]" required>
-                                        <option value="Year">Yr</option>
-                                        <option value="Month">Mnth</option>
-                                    </select>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="mb-6">
-                                <label for="gender" class="form-label">Gender:</label>
-                                <select class="form-select" name="gender[]" required>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                </select>
-                            </div>
-                        </div> 
-                        
-                        <div class="col-md-2">
-                            <div class="mb-6">
-                                <label for="color" class="form-label">Pet Color:</label>
-                                <input type="text" class="form-control" name="color[]" required>
-                            </div>
-                        </div>
-                    </div> 
-                        <div class="col-md-2">
-                            <div class="mb-6">
-                                <label for="status_pet" class="form-label">Status:</label>
-                                <select class="form-select" name="status_pet[]" required>
-                                    <option value="Active">Active</option>
-                                </select>
-                            </div>
-                        </div> 
-                        <div class="col-md-3">
-                            <div class="mb-6">
-                                <label for="image" class="form-label">Image:</label>
-                                <input type="file" class="form-control" name="image[]" accept="image/*">
-                            </div>
-                        </div>
-                     <button type="button" class="remove-pet" onclick="removePet(this)">x</button>
+                <div class="col-md-4">
+                    <label for="middle_name" class="form-label">Middle Name:</label>
+                    <input type="text" class="form-control" id="middle_name" name="middle_name">
                 </div>
             </div>
-            <br>
-            <button type="button" class="btn btn-success register-button" id="add_pet">Add Another Pet</button>
-            <button type="submit" class="btn btn-primary register-button">Register</button>
-            <button type="button" class="btn btn-danger cancel-button" onclick="cancelRegistration()">Cancel</button>
+
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <label for="gender" class="form-label">Gender:</label>
+                    <select class="form-select" id="gender" name="gender" required>
+                        <option value="">Select</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="age" class="form-label">Age:</label>
+                    <input type="number" class="form-control" id="age" name="age" min="1" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="birthdate" class="form-label">Birthdate:</label>
+                    <input type="date" class="form-control" id="birthdate" name="birthdate" required>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <label for="user_name" class="form-label">Username:</label>
+                    <input type="text" class="form-control" id="user_name" name="user_name" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="email" class="form-label">Email:</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="phone" class="form-label">Phone Number:</label>
+                    <input type="tel" class="form-control" id="phone" name="phone" pattern="[0-9]{11}" title="Enter a valid 11-digit number starting with 09" required>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <label for="tel_number" class="form-label">Telephone Number (Optional):</label>
+                    <input type="tel" class="form-control" id="tel_number" name="tel_number">
+                </div>
+                <div class="col-md-4">
+                    <label for="house_number" class="form-label">House Number:</label>
+                    <input type="text" class="form-control" id="house_number" name="house_number" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="street" class="form-label">Street:</label>
+                    <input type="text" class="form-control" id="street" name="street" required>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <label for="brgy" class="form-label">Barangay:</label>
+                    <input type="text" class="form-control" id="brgy" name="brgy" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="city" class="form-label">City:</label>
+                    <input type="text" class="form-control" id="city" name="city" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="province" class="form-label">Province:</label>
+                    <input type="text" class="form-control" id="province" name="province" required>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <label for="zip_code" class="form-label">Zip Code:</label>
+                    <input type="text" class="form-control" id="zip_code" name="zip_code" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="password" class="form-label">Password:</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="confirm_password" class="form-label">Confirm Password:</label>
+                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                </div>
+            </div>
+
+            <!-- Dynamic Pet Details -->
+            <h4 class="mt-4">Pet Details</h4>
+            <div id="pet_details">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label for="pet_name" class="form-label">Pet Name:</label>
+                        <input type="text" class="form-control" name="pet_name[]" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="pet_type" class="form-label">Pet Type:</label>
+                        <select class="form-select" name="pet_type[]" required>
+                            <option value="">Select</option>
+                            <option value="Dog">Dog</option>
+                            <option value="Cat">Cat</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="breed" class="form-label">Breed:</label>
+                        <input type="text" class="form-control" name="breed[]" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="color" class="form-label">Color:</label>
+                        <input type="text" class="form-control" name="color[]" required>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-md-4">
+                        <label for="pet_age" class="form-label">Age:</label>
+                        <input type="number" class="form-control" name="pet_age[]" min="0" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="pet_gender" class="form-label">Gender:</label>
+                        <select class="form-select" name="pet_gender[]" required>
+                            <option value="">Select</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="pet_image" class="form-label">Pet Image:</label>
+                        <input type="file" class="form-control" name="pet_image[]" accept="image/*">
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                  
+                    <div class="col-md-4">
+                        <label for="pet_birthdate" class="form-label">Pet BirthDate:</label>
+                        <input type="date" class="form-control" name="pet_birthdate[]" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="pet_weight" class="form-label">Pet Weight (kg):</label>
+                        <input type="number" class="form-control" name="weight[]" step="0.01" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="pet_height" class="form-label">Pet Height (cm):</label>
+                        <input type="number" class="form-control" name="height[]" step="0.01" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="description" class="form-label">Description:</label>
+                        <textarea class="form-control" name="description[]" rows="3"></textarea>
+                    </div>
+                </div>
+
+            </div>
+            <button type="button" id="add_pet" class="btn btn-success mt-3">Add Another Pet</button>
+            <button type="submit" class="btn btn-primary mt-3">Register</button>
         </form>
     </div>
-</div>
-<script>
-    // Function to dynamically populate breed options based on pet type
-    document.addEventListener("change", function (event) {
-        if (event.target && event.target.matches("select[name^='pet_type']")) {
-            const petType = event.target.value;
-            const petNumber = event.target.id.split("_")[2];
-            const breedSelect = document.getElementById(`pet_breed_${petNumber}`);
 
-            // Clear previous breed options
-            breedSelect.innerHTML = "";
-
-            // Create default option
-            const defaultOption = document.createElement("option");
-            defaultOption.value = "";
-            defaultOption.textContent = "Select pet type first";
-            breedSelect.appendChild(defaultOption);
-
-            // Populate breed options based on pet type
-            if (petType === "Dog") {
-                const dogBreeds = ["Labrador Retriever", "German Shepherd", "Golden Retriever", "Bulldog", "Beagle"];
-                dogBreeds.forEach(breed => {
-                    const option = document.createElement("option");
-                    option.value = breed;
-                    option.textContent = breed;
-                    breedSelect.appendChild(option);
-                });
-            } else if (petType === "Cat") {
-                const catBreeds = ["Siamese", "Persian", "Maine Coon", "Ragdoll", "British Shorthair"];
-                catBreeds.forEach(breed => {
-                    const option = document.createElement("option");
-                    option.value = breed;
-                    option.textContent = breed;
-                    breedSelect.appendChild(option);
-                });
-            }
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById("sidebar");
+            sidebar.classList.toggle("closed");
         }
-    });
 
-    function removePet(button) {
-        var petDiv = button.parentNode;
-        petDiv.parentNode.removeChild(petDiv);
-    }
-
-    function cancelRegistration() {
-        // Redirect to the homepage or any other desired action
-        window.location.href = "Pet_management.php";
-    }
-
-    function validateForm() {
-        var phoneInput = document.getElementById('contact_number');
-        var phone = phoneInput.value.trim();
-        if (!phone.startsWith('09') || phone.length !== 11 || isNaN(phone)) {
-            alert('Please enter a valid 11-digit phone number starting with 09.');
-            phoneInput.focus();
-            return false;
-        }
-        var emailInput = document.getElementById('email');
-        var email = emailInput.value.trim();
-        if (!email.endsWith('@gmail.com')) {
-            alert('Please enter a valid Gmail address.');
-            emailInput.focus();
-            return false;
-        }
-        return true;
-    }
-    document.getElementById('add_pet').addEventListener('click', function() {
-            var petDiv = document.createElement('div');
-            petDiv.classList.add('pet');
-
-            petDiv.innerHTML = `
-            <div class="row">
-                        <div class="col-md-3">
-                            <div class="mb-6">
-                                <label for="name" class="form-label">Name:</label>
-                                <input type="text" class="form-control" id="name" name="name[]" required>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="mb-3">
-                                <label for="pet_type_1" class="form-label">Pet Type:</label>
-                                <select class="form-select" id="pet_type_1" name="pet_type[]" required>
-                                    <option value="">Select</option>
-                                    <option value="Dog">Dog</option>
-                                    <option value="Cat">Cat</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                                <div class="mb-3">
-                                <label for="pet_breed_1" class="form-label">Pet Breed:</label>
-                                <select class="form-select" id="pet_breed_1" name="pet_breed[]" required>
-                                    <!-- Breed options will be populated dynamically using JavaScript -->
-                                </select>
-                            </div>
-                        </div> 
-                        <div class="col-md-3">
-                            <div class="mb-6">
-                                <label for="desc_breed" class="form-label">Breed Description:</label>
-                                <input type="text" class="form-control" name="desc_breed[]" placeholder="Mixed breed(aspin/poodle)" required>
-                            </div>
-                        </div> 
-                    </div> 
-                    <div class="row">
-                        <div class="col-md-2">
-                            <div class="mb-6">
-                                <label for="petage" class="form-label">Age:</label>
-                                <input type="number" class="form-control" id="petage" name="petage[]" required>
-                            </div>
-                        </div> 
-                        <div class="col-md-2">
-                            <div class="mb-6">        
-                                <label for="age_type" class="form-label">Yr/Mnth Old:</label>
-                                    <select class="form-select" name="age_type[]" required>
-                                        <option value="Year">Yr</option>
-                                        <option value="Month">Mnth</option>
-                                    </select>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="mb-6">
-                                <label for="gender" class="form-label">Gender:</label>
-                                <select class="form-select" name="gender[]" required>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                </select>
-                            </div>
-                        </div> 
-                        
-                        <div class="col-md-2">
-                            <div class="mb-6">
-                                <label for="color" class="form-label">Pet Color:</label>
-                                <input type="text" class="form-control" name="color[]" required>
-                            </div>
-                        </div>
-                    </div> 
-                        <div class="col-md-2">
-                            <div class="mb-6">
-                                <label for="status_pet" class="form-label">Status:</label>
-                                <select class="form-select" name="status_pet[]" required>
-                                    <option value="Active">Active</option>
-                                    <option value="Female">Dead</option>
-                                    <option value="Male">Missing</option>
-                                    <option value="Female">Found</option>
-                                </select>
-                            </div>
-                        </div> 
-                        <div class="col-md-3">
-                            <div class="mb-6">
-                                <label for="image" class="form-label">Image:</label>
-                                <input type="file" class="form-control" name="image[]" accept="image/*">
-                            </div>
-                        </div>
-                     <button type="button" class="remove-pet" onclick="removePet(this)">x</button>
-            `;
-            
-            document.getElementById('pet_details').appendChild(petDiv);
+        document.getElementById('add_pet').addEventListener('click', function() {
+            const container = document.getElementById('pet_details');
+            const newPet = `
+                <div class="row mt-3">
+                    <div class="col-md-3">
+                        <label for="pet_name" class="form-label">Pet Name:</label>
+                        <input type="text" class="form-control" name="pet_name[]" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="pet_type" class="form-label">Pet Type:</label>
+                        <select class="form-select" name="pet_type[]" required>
+                            <option value="">Select</option>
+                            <option value="Dog">Dog</option>
+                            <option value="Cat">Cat</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="breed" class="form-label">Breed:</label>
+                        <input type="text" class="form-control" name="breed[]" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="color" class="form-label">Color:</label>
+                        <input type="text" class="form-control" name="color[]" required>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-4">
+                        <label for="pet_age" class="form-label">Age:</label>
+                        <input type="number" class="form-control" name="pet_age[]" min="0" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="pet_gender" class="form-label">Gender:</label>
+                        <select class="form-select" name="pet_gender[]" required>
+                            <option value="">Select</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="pet_image" class="form-label">Pet Image:</label>
+                        <input type="file" class="form-control" name="pet_image[]" accept="image/*">
+                    </div>
+                </div>
+                
+                               <div class="row mt-3">
+                      
+                    <div class="col-md-4">
+                        <label for="pet_birthdate" class="form-label">Pet BirthDate:</label>
+                        <input type="date" class="form-control" name="pet_birthdate[]" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="pet_weight" class="form-label">Pet Weight (kg):</label>
+                        <input type="number" class="form-control" name="weight[]" step="0.01" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="pet_height" class="form-label">Pet Height (cm):</label>
+                        <input type="number" class="form-control" name="height[]" step="0.01" required>
+                    </div>
+                      <div class="col-md-4">
+                        <label for="description" class="form-label">Description:</label>
+                        <textarea class="form-control" name="description[]" rows="3"></textarea>
+                    </div>
+                </div>
+                `;
+            container.insertAdjacentHTML('beforeend', newPet);
         });
-</script>
 
+        function validateForm() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!');
+                return false;
+            }
+            return true;
+        }
+    </script>
 </body>
+
 </html>
